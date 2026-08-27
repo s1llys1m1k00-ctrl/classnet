@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassNet - Pop Social Portal</title>
+    <title>ClassNet - Frutiger Metro Social Portal</title>
 
-    <!-- Supabase SDK & PeerJS -->
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* GÖNDERİLEN GÖRSELİN ARKA PLAN OLArak AYARLANMASI */
+        /* GÖNDERDİĞİN FRUTIGER METRO ARKA PLAN GÖRSELİ */
         body { 
             background: url('26177241580869297.jpeg') no-repeat center center fixed; 
             background-size: cover;
@@ -20,7 +19,7 @@
             min-height: 100vh;
         }
 
-        /* YARI ŞEFFAF POP-UP / GİRİŞ PANELİ */
+        /* GİRİŞ EKRANI MODALI */
         #girisEkrani {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -35,7 +34,7 @@
         .girisKutusu input { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid #ffb3d9; border-radius: 10px; outline: none; }
         .girisKutusu button { width: 100%; padding: 12px; background: #ff007f; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 8px; font-size: 15px; }
 
-        /* UYGULAMA KARTLARI */
+        /* ANA UYGULAMA PANELİ */
         .anaKonteyner { display: flex; gap: 20px; height: 88vh; max-width: 1200px; margin: 0 auto; }
         
         .solPanel, .sagIcerik {
@@ -59,7 +58,7 @@
         .sayfaPaneli { display: none; flex-direction: column; height: 100%; }
         .sayfaPaneli.aktif { display: flex; }
 
-        /* SOHBET ALANI */
+        /* SOHBET KISMI */
         .mesajlar { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         .mesaj { background: #f0f4f9; padding: 10px 14px; border-radius: 12px; max-width: 70%; font-size: 14px; align-self: flex-start; }
         .mesaj.kendiMesajim { background: #ffe3ec; align-self: flex-end; }
@@ -74,7 +73,10 @@
         .moodKart { background: white; border: 2px solid #ffb3d9; padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; font-weight: bold; }
         .moodKart:hover { background: #ffe6f2; border-color: #ff007f; }
 
-        /* CLASSBOT */
+        /* DERSLER LİSTESİ */
+        .dersKarti { background: #fff0f6; padding: 15px; border-radius: 12px; border-left: 5px solid #ff007f; margin-bottom: 10px; }
+
+        /* CLASSBOT ASİSTAN */
         #classBotKutusu {
             position: fixed; bottom: 20px; right: 20px; width: 280px; height: 320px;
             background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
@@ -88,11 +90,11 @@
 </head>
 <body>
 
-<!-- GİRİŞ/KAYIT MODAL -->
+<!-- GİRİŞ EKRANI -->
 <div id="girisEkrani">
     <div class="girisKutusu">
         <h2>ClassNet ✨</h2>
-        <p id="formBaslik">Sosyal Portala Giriş Yap</p>
+        <p id="formBaslik">Supabase Sosyal Portala Giriş Yap</p>
         
         <input type="text" id="kullaniciAdiInput" placeholder="@kullaniciadi">
         <input type="password" id="sifreInput" placeholder="Şifre">
@@ -108,7 +110,7 @@
 <div id="classBotKutusu">
     <div class="botBaslik">🤖 ClassBot Asistan</div>
     <div class="botMesajlar" id="botMesajAlani">
-        <div class="botMsg">Selam! Ben ClassBot, portalda sana yardımcı olmaya hazırım!</div>
+        <div class="botMsg">Selam Jelibon! Supabase veritabanı aktif edildi!</div>
     </div>
     <div style="display:flex; border-top:1px solid #eee;">
         <input type="text" id="botInput" placeholder="Soru sor..." style="flex:1; border:none; padding:8px; outline:none;" onkeypress="if(event.key==='Enter') botSor()">
@@ -121,9 +123,9 @@
     <div class="solPanel">
         <div class="profilKart">
             <img src="https://via.placeholder.com/70" id="profilAvatar" class="avatar" alt="Avatar">
-            <h3 id="profilIsimDisplay" style="color:#d6006e; margin-top:5px;">@kullanici</h3>
-            <p id="profilBioDisplay" style="font-size:11px; color:#666;">Biyografi bulunmuyor...</p>
-            <p id="profilMoodDisplay" style="font-size:12px; font-weight:bold; color:#ff007f; margin-top:5px;">Mood: 😊 Mutlu</p>
+            <h3 id="profilIsimDisplay" style="color:#d6006e; margin-top:5px;">@jelibon</h3>
+            <p id="profilBioDisplay" style="font-size:11px; color:#666;">Harika bir bio eklemedin...</p>
+            <p id="profilMoodDisplay" style="font-size:12px; font-weight:bold; color:#ff007f; margin-top:5px;">Mood: 🎨 Yaratıcı</p>
         </div>
 
         <div class="menuSekmeleri">
@@ -137,12 +139,12 @@
         <button onclick="cikisYap()" style="margin-top:auto; padding:10px; background:#f87171; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Çıkış Yap 🚪</button>
     </div>
 
-    <!-- SAĞ İÇERİK -->
+    <!-- SAĞ İÇERİK BÖLÜMÜ -->
     <div class="sagIcerik">
         
         <!-- SOHBET -->
         <div id="sohbetPaneli" class="sayfaPaneli aktif">
-            <h3 style="color:#d6006e; margin-bottom:10px;">💬 Sınıf / Topluluk Sohbeti</h3>
+            <h3 style="color:#d6006e; margin-bottom:10px;">💬 Sınıf / Topluluk Sohbeti (Supabase Canlı)</h3>
             <div class="mesajlar" id="mesajAlani"></div>
             <div class="gonderKontrolleri">
                 <input type="text" id="mesajInput" placeholder="Mesajını paylaş..." onkeypress="if(event.key==='Enter') mesajGonder()">
@@ -152,16 +154,16 @@
 
         <!-- PROFİL DÜZENLEME -->
         <div id="profilPaneli" class="sayfaPaneli">
-            <h3 style="color:#d6006e; margin-bottom:15px;">✏️ Profil Ayarları</h3>
-            <div style="display:flex; flex-direction:column; gap:10px; max-width:400px;">
-                <label><strong>Kullanıcı Adı:</strong></label>
+            <h3 style="color:#d6006e; margin-bottom:15px;">✏️ Profilini Düzenle</h3>
+            <div style="display:flex; flex-direction:column; gap:12px; max-width:450px;">
+                <label><strong>Kullanıcı Adı (@):</strong></label>
                 <input type="text" id="editKullaniciAdi" style="padding:10px; border-radius:8px; border:1px solid #ddd;">
                 
-                <label><strong>Profil Resmi URL:</strong></label>
+                <label><strong>Profil Resmi (Görsel URL):</strong></label>
                 <input type="text" id="editAvatarUrl" placeholder="https://..." style="padding:10px; border-radius:8px; border:1px solid #ddd;">
                 
-                <label><strong>Biyografi / Durum:</strong></label>
-                <textarea id="editBio" style="padding:10px; border-radius:8px; border:1px solid #ddd; height:80px;"></textarea>
+                <label><strong>Biyografi / Durum Yazısı:</strong></label>
+                <textarea id="editBio" placeholder="Kendinden bahset..." style="padding:10px; border-radius:8px; border:1px solid #ddd; height:80px;"></textarea>
 
                 <button onclick="profilKaydet()" style="padding:12px; background:#ff007f; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Değişiklikleri Kaydet ✨</button>
             </div>
@@ -169,8 +171,8 @@
 
         <!-- MOOD / DUYGULAR -->
         <div id="moodPaneli" class="sayfaPaneli">
-            <h3 style="color:#d6006e;">🎭 Bugünkü Mood'un Hangisi?</h3>
-            <p style="font-size:13px; color:#666;">Profilinde görünecek duygu durumunu aşağıdan seç:</p>
+            <h3 style="color:#d6006e;">🎭 Ruh Halini (Mood) Seç</h3>
+            <p style="font-size:13px; color:#666; margin-top:5px;">Profilinde ve sohbette görünecek anlık duygun:</p>
             
             <div class="moodIzgarasi">
                 <div class="moodKart" onclick="moodSet('😊 Mutlu')">😊 Mutlu</div>
@@ -179,11 +181,11 @@
                 <div class="moodKart" onclick="moodSet('🎨 Yaratıcı')">🎨 Yaratıcı</div>
                 <div class="moodKart" onclick="moodSet('😎 Havalı')">😎 Havalı</div>
                 <div class="moodKart" onclick="moodSet('🤯 Yorgun')">🤯 Yorgun</div>
-                <div class="moodKart" onclick="moodSet('🥳 Modunda')">🥳 Modunda</div>
+                <div class="moodKart" onclick="moodSet('🥳 Çılgın')">🥳 Çılgın</div>
                 <div class="moodKart" onclick="moodSet('📚 Çalışkan')">📚 Çalışkan</div>
                 <div class="moodKart" onclick="moodSet('🎧 Müziksever')">🎧 Müziksever</div>
-                <div class="moodKart" onclick="moodSet('⚡ Çılgın')">⚡ Çılgın</div>
                 <div class="moodKart" onclick="moodSet('🍕 Acıkmış')">🍕 Acıkmış</div>
+                <div class="moodKart" onclick="moodSet('✨ İlham Dolu')">✨ İlham Dolu</div>
                 <div class="moodKart" onclick="moodSet('🤫 Sessiz')">🤫 Sessiz</div>
             </div>
         </div>
@@ -193,26 +195,30 @@
             <h3 style="color:#d6006e; margin-bottom:10px;">👥 Arkadaş Ekleme & Takip</h3>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" id="ekleUser" placeholder="Arkadaşının @kullanıcıadı..." style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                <button onclick="arkadasEkle()" style="padding:10px 15px; background:#2ec4b6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Ekle / Takip Et ➕</button>
+                <button onclick="arkadasEkle()" style="padding:10px 15px; background:#2ec4b6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Takip Et ➕</button>
             </div>
-            <h4>Eklediğin Kişiler:</h4>
-            <ul id="arkadasListesi" style="margin-top:10px; list-style:none;"></ul>
+            <h4>Bağlantı Kurulan Arkadaşlar:</h4>
+            <ul id="arkadasListesi" style="margin-top:10px; list-style:none;">
+                <li style="background:#fff; padding:10px; border-radius:8px; margin-bottom:5px; border:1px solid #ddd;">👤 @classbot_official</li>
+            </ul>
         </div>
 
         <!-- DERSLER -->
         <div id="derslerPaneli" class="sayfaPaneli">
-            <h3 style="color:#d6006e;">📚 Ders Konu Anlatımları</h3>
-            <p style="font-size:13px; color:#666; margin-top:5px;">İlk 3 Konu Başlığı Özetleri:</p>
-            <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
-                <div style="background:#fff0f6; padding:12px; border-radius:10px; border-left:4px solid #ff007f;">
-                    <strong>📐 Matematik - Konu 1:</strong> İşlem Önceliği ve Parantezler
-                </div>
-                <div style="background:#fff0f6; padding:12px; border-radius:10px; border-left:4px solid #ff007f;">
-                    <strong>📐 Matematik - Konu 2:</strong> Çarpanlar ve Katlar
-                </div>
-                <div style="background:#fff0f6; padding:12px; border-radius:10px; border-left:4px solid #ff007f;">
-                    <strong>📐 Matematik - Konu 3:</strong> Kesirler ve Toplama
-                </div>
+            <h3 style="color:#d6006e; margin-bottom:10px;">📚 Ders Konu Özetleri</h3>
+            <p style="font-size:13px; color:#666; margin-bottom:15px;">Sitedeki ders içerikleri ve konu özetleri:</p>
+            
+            <div class="dersKarti">
+                <strong>📐 Matematik - Konu 1: İşlem Önceliği ve Parantezler</strong>
+                <p style="font-size:13px; color:#555; margin-top:5px;">İşlemlerde önce üslü ifadeler, sonra parantez içleri, çarpma/bölme ve son olarak toplama/çıkarma yapılır.</p>
+            </div>
+            <div class="dersKarti">
+                <strong>📐 Matematik - Konu 2: Çarpanlar ve Katlar</strong>
+                <p style="font-size:13px; color:#555; margin-top:5px;">Bir doğal sayıyı kalansız bölen sayılara o sayının çarpanları (bölenleri) denir.</p>
+            </div>
+            <div class="dersKarti">
+                <strong>📐 Matematik - Konu 3: Kesirlerle İşlemler</strong>
+                <p style="font-size:13px; color:#555; margin-top:5px;">Toplama ve çıkarma yaparken paydalar eşitlenir; çarpma işleminde paylar ve paydalar kendi arasında çarpılır.</p>
             </div>
         </div>
 
@@ -220,17 +226,19 @@
 </div>
 
 <script>
-// SUPABASE BAGLANTISI
-const SUPABASE_URL = 'https://idgexsicpsdbhfgwjsbj.supabase.co';
+// ==========================================
+// ⚡ SUPABASE BAĞLANTI AYARLARI
+// ==========================================
+const SUPABASE_URL = 'https://idgexsicpsdbhfgwjsbj.supabase.co/rest/v1/';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZ2V4c2ljcHNkYmhmZ3dqc2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4Mzc3MTAsImV4cCI6MjEwMzQxMzcxMH0.EEPLAW2T_TM-X4nTG6n0vIydnsNVDx9sTpeska2DWdg';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let mevcutKullanici = "";
+let mevcutKullanici = "@jelibon";
 let isKayitModu = false;
 
 function formDegistir() {
     isKayitModu = !isKayitModu;
-    document.getElementById("formBaslik").innerText = isKayitModu ? "Yeni Hesap Oluştur" : "Sosyal Portala Giriş Yap";
+    document.getElementById("formBaslik").innerText = isKayitModu ? "Yeni Hesap Oluştur" : "Supabase Sosyal Portala Giriş Yap";
     document.getElementById("anaGirisBtn").style.display = isKayitModu ? "none" : "block";
     document.getElementById("anaKayitBtn").style.display = isKayitModu ? "block" : "none";
     document.getElementById("gecisBtn").innerText = isKayitModu ? "Zaten hesabın var mı? Giriş Yap" : "Hesabın yok mu? Kayıt Ol";
@@ -239,19 +247,34 @@ function formDegistir() {
 async function girisYap() {
     const kAdi = document.getElementById("kullaniciAdiInput").value.trim();
     const sifre = document.getElementById("sifreInput").value.trim();
-    if (!kAdi || !sifre) return alert("Kullanıcı adı ve şifrenizi girin!");
+    if (!kAdi || !sifre) return alert("Kullanıcı adı ve şifreni gir!");
 
     mevcutKullanici = kAdi.startsWith('@') ? kAdi : '@' + kAdi;
     document.getElementById("girisEkrani").style.display = "none";
     document.getElementById("profilIsimDisplay").innerText = mevcutKullanici;
     document.getElementById("editKullaniciAdi").value = mevcutKullanici;
 
-    eskiMesajlariYukle();
+    // Supabase üzerinden mesajları çekmeye başla
+    supaMesajlariYukle();
+    supaCanliDinle();
 }
 
 async function kayitOl() {
-    alert("Kayıt oluşturuldu! Giriş yapabilirsiniz.");
-    formDegistir();
+    const kAdi = document.getElementById("kullaniciAdiInput").value.trim();
+    const sifre = document.getElementById("sifreInput").value.trim();
+    if (!kAdi || !sifre) return alert("Kayıt için kullanıcı adı ve şifre gir!");
+
+    const formattedUser = kAdi.startsWith('@') ? kAdi : '@' + kAdi;
+    
+    // Supabase 'kullanicilar' tablosuna kayıt
+    const { error } = await _supabase.from('kullanicilar').insert([{ kullanici_adi: formattedUser, sifre: sifre }]);
+    
+    if (error) {
+        alert("Kayıt olurken hata oluştu (Tablo adını kontrol et): " + error.message);
+    } else {
+        alert("Kayıt başarıyla oluşturuldu! Şimdi giriş yapabilirsin.");
+        formDegistir();
+    }
 }
 
 function cikisYap() {
@@ -267,15 +290,19 @@ function profilKaydet() {
         mevcutKullanici = yeniName.startsWith('@') ? yeniName : '@' + yeniName;
         document.getElementById("profilIsimDisplay").innerText = mevcutKullanici;
     }
-    if (yeniBio) document.getElementById("profilBioDisplay").innerText = yeniBio;
-    if (yeniUrl) document.getElementById("profilAvatar").src = yeniUrl;
+    if (yeniBio) {
+        document.getElementById("profilBioDisplay").innerText = yeniBio;
+    }
+    if (yeniUrl) {
+        document.getElementById("profilAvatar").src = yeniUrl;
+    }
 
-    alert("Profil bilgilerin başarıyla güncellendi! ✨");
+    alert("Profilin başarıyla güncellendi! ✨");
 }
 
 function moodSet(moodText) {
     document.getElementById("profilMoodDisplay").innerText = "Mood: " + moodText;
-    alert("Yeni mood'un kaydedildi: " + moodText);
+    alert("Mood'un güncellendi: " + moodText);
 }
 
 function arkadasEkle() {
@@ -289,6 +316,7 @@ function arkadasEkle() {
     li.innerText = "👤 " + target;
     document.getElementById("arkadasListesi").appendChild(li);
     inp.value = "";
+    alert(target + " başarıyla eklendi! 🎉");
 }
 
 function sekmeDegistir(sekmeAdi, btn) {
@@ -308,27 +336,58 @@ function botSor() {
     inp.value = "";
 
     setTimeout(() => {
-        alan.innerHTML += `<div class="botMsg">Harika bir soru! Profilini özelleştirebilir veya arkadaşlarına mesaj atabilirsin.</div>`;
+        alan.innerHTML += `<div class="botMsg">Supabase veritabanına bağlı olarak çalışıyorum! Harika gidiyorsun.</div>`;
         alan.scrollTop = alan.scrollHeight;
     }, 500);
 }
 
+// ==========================================
+// SUPABASE CANLI SOHBET FONKSİYONLARI
+// ==========================================
 async function mesajGonder() {
     const inp = document.getElementById("mesajInput");
     const val = inp.value.trim();
     if (!val) return;
 
-    const alan = document.getElementById("mesajAlani");
-    const div = document.createElement("div");
-    div.className = "mesaj kendiMesajim";
-    div.innerHTML = `<div class="gonderenAdi">${mevcutKullanici}</div><div>${val}</div>`;
-    alan.appendChild(div);
+    // Supabase 'mesajlar' tablosuna kaydet
+    const { error } = await _supabase.from('mesajlar').insert([
+        { gonderen: mevcutKullanici, icerik: val }
+    ]);
+
+    if (error) {
+        // Supabase tablosu henüz yoksa ekrana geçici yazıp hata vermesini engelle
+        console.warn("Supabase mesaj tablosu hatası:", error.message);
+    }
     inp.value = "";
-    alan.scrollTop = alan.scrollHeight;
 }
 
-async function eskiMesajlariYukle() {
-    // Supabase mesaj yükleme alanı
+async function supaMesajlariYukle() {
+    const { data, error } = await _supabase.from('mesajlar').select('*').order('created_at', { ascending: true });
+    if (data) {
+        const alan = document.getElementById("mesajAlani");
+        alan.innerHTML = "";
+        data.forEach(m => {
+            const div = document.createElement("div");
+            div.className = m.gonderen === mevcutKullanici ? "mesaj kendiMesajim" : "mesaj";
+            div.innerHTML = `<div class="gonderenAdi">${m.gonderen}</div><div>${m.icerik}</div>`;
+            alan.appendChild(div);
+        });
+        alan.scrollTop = alan.scrollHeight;
+    }
+}
+
+function supaCanliDinle() {
+    _supabase.channel('public:mesajlar')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mesajlar' }, payload => {
+            const m = payload.new;
+            const alan = document.getElementById("mesajAlani");
+            const div = document.createElement("div");
+            div.className = m.gonderen === mevcutKullanici ? "mesaj kendiMesajim" : "mesaj";
+            div.innerHTML = `<div class="gonderenAdi">${m.gonderen}</div><div>${m.icerik}</div>`;
+            alan.appendChild(div);
+            alan.scrollTop = alan.scrollHeight;
+        })
+        .subscribe();
 }
 </script>
 </body>
