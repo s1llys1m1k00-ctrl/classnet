@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassNet - 6C Sınıf Portalı</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; padding: 20px; }
+
+        /* GİRİŞ EKRANI MODAL */
+        #girisEkrani {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 999;
+        }
+        .girisKutusu { background: white; padding: 30px; border-radius: 16px; text-align: center; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .girisKutusu h2 { color: #ff5e97; margin-bottom: 10px; }
+        .girisKutusu input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .girisKutusu button { width: 100%; padding: 10px; background: #ff5e97; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* UYGULAMA DÜZENİ */
+        .anaKonteyner { display: flex; gap: 20px; height: 88vh; max-width: 1200px; margin: 0 auto; }
+        
+        /* SOL PANEL */
+        .solPanel { width: 280px; background: white; border-radius: 16px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
+        .solPanel h3 { color: #ff5e97; font-size: 15px; }
+        .peerIdBilgi { font-size: 11px; background: #eef2f5; padding: 8px; border-radius: 6px; color: #555; word-break: break-all; }
+        
+        /* MENÜ SEKMELERİ */
+        .menuSekmeleri { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .sekmeBtn { padding: 10px 12px; background: #f8f9fa; border: 1px solid #eee; border-radius: 8px; cursor: pointer; text-align: left; font-weight: bold; color: #555; }
+        .sekmeBtn.aktif { background: #ff5e97; color: white; border-color: #ff5e97; }
+
+        /* SAĞ İÇERİK PANELLERİ */
+        .sagIcerik { flex: 1; background: white; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-y: auto; }
+        .sayfaPaneli { display: none; flex-direction: column; height: 100%; }
+        .sayfaPaneli.aktif { display: flex; }
+
+        /* SOHBET ALANI */
+        .sohbetBaslik { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .mesajlar { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        .mesaj { background: #f0f4f9; padding: 10px 14px; border-radius: 12px; max-width: 70%; font-size: 14px; align-self: flex-start; position: relative; }
+        .mesaj.kendiMesajim { background: #ffe3ec; align-self: flex-end; }
+        .mesaj.sticker img { max-width: 150px; border-radius: 8px; display: block; }
+        .mesaj .gonderenAdi { font-size: 11px; font-weight: bold; color: #ff5e97; margin-bottom: 4px; }
+        .mesajSilBtn { background: transparent; border: none; cursor: pointer; font-size: 12px; margin-left: 8px; opacity: 0.6; }
+        .mesajSilBtn:hover { opacity: 1; }
+
+        .gonderKontrolleri { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+        .gonderKontrolleri input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
+        .stickerEkleBtn { background: #eee; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; user-select: none; }
+        .gonderBtn { background: #ff5e97; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+
+        /* DERSLER & ÖDEVLER & DUYURULAR */
+        .dersIzgarasi { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .dersKarti { background: #fdf2f8; border: 1px solid #fbcfe8; padding: 15px; border-radius: 12px; }
+        .dersKarti h4 { color: #be185d; margin-bottom: 8px; }
+        .listeElemani { background: #f8f9fa; border-left: 4px solid #ff5e97; padding: 10px 15px; margin-bottom: 10px; border-radius: 4px; list-style: none; }
+
+        /* GÖRÜNTÜLÜ KONUŞMA MODAL */
+        #videoModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .videoGrid { display: flex; gap: 20px; margin-bottom: 20px; }
+        video { width: 320px; height: 240px; background: #222; border-radius: 12px; object-fit: cover; }
+        .kapatBtn { background: #e63946; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="girisEkrani">
+    <div class="girisKutusu">
+        <h2>ClassNet 🚀</h2>
+        <p>Sınıf portalına katılmak için adını gir!</p>
+        <input type="text" id="kullaniciAdiInput" placeholder="Kullanıcı Adın...">
+        <button onclick="girisYap()">Sınıfa Katıl</button>
+    </div>
+</div>
+
+<div id="videoModal">
+    <div class="videoGrid">
+        <video id="localVideo" autoplay muted></video>
+        <video id="remoteVideo" autoplay></video>
+    </div>
+    <button class="kapatBtn" onclick="aramayiKapat()">Aramayı Sonlandır 📞</button>
+</div>
+
+<div class="anaKonteyner">
+    <div class="solPanel">
+        <h3>👤 Profilim</h3>
+        <div class="peerIdBilgi" id="myPeerId">Arama Kodunuz Yükleniyor...</div>
+
+        <h3>📌 Menü</h3>
+        <div class="menuSekmeleri">
+            <button class="sekmeBtn aktif" onclick="sekmeDegistir('sohbet', this)">💬 Sınıf Sohbeti</button>
+            <button class="sekmeBtn" onclick="sekmeDegistir('dersler', this)">📚 Dersler & Konular</button>
+            <button class="sekmeBtn" onclick="sekmeDegistir('odevler', this)">📝 Ödevler</button>
+            <button class="sekmeBtn" onclick="sekmeDegistir('duyurular', this)">📢 Duyurular</button>
+        </div>
+
+        <h3 style="margin-top: 10px;">📞 Görüntülü Arama</h3>
+        <input type="text" id="aramaIdInput" placeholder="Arkadaşının Kodu..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        <button onclick="goruntuluAra()" style="padding:8px; background:#ff758c; color:white; border:none; border-radius:6px; cursor:pointer;">Ara 📹</button>
+    </div>
+
+    <div class="sagIcerik">
+        
+        <div id="sohbetPaneli" class="sayfaPaneli aktif">
+            <div class="sohbetBaslik">
+                <h3>💬 Sınıf Canlı Sohbeti</h3>
+                <button onclick="sohbetiTemizle()" style="padding: 5px 10px; background: #f87171; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ Sohbeti Temizle</button>
+            </div>
+            <div class="mesajlar" id="mesajAlani"></div>
+            <div class="gonderKontrolleri">
+                <label class="stickerEkleBtn" title="Galeriden Çıkartma/Resim Seç">
+                    🖼️ Sticker
+                    <input type="file" accept="image/*" style="display: none;" onchange="stickerYukle(this)">
+                </label>
+                <input type="text" id="mesajInput" placeholder="Mesajını yaz..." onkeypress="if(event.key==='Enter') mesajGonder()">
+                <button class="gonderBtn" onclick="mesajGonder()">Gönder 🚀</button>
+            </div>
+        </div>
+
+        <div id="derslerPaneli" class="sayfaPaneli">
+            <h2>📚 Sınıf Dersleri & Konuları</h2>
+            <p style="color: #666; margin-top: 5px;">Haftalık ders programı ve işlenen konular:</p>
+            
+            <div class="dersIzgarasi">
+                <div class="dersKarti">
+                    <h4>📐 Matematik</h4>
+                    <p><strong>Konu:</strong> Kesirlerle İşlemler</p>
+                    <p><strong>Öğretmen:</strong> Matematik Öğretmeni</p>
+                </div>
+                <div class="dersKarti">
+                    <h4>🧪 Fen Bilimleri</h4>
+                    <p><strong>Konu:</strong> Güneş Sistemimiz</p>
+                    <p><strong>Öğretmen:</strong> Fen Öğretmeni</p>
+                </div>
+                <div class="dersKarti">
+                    <h4>📖 Türkçe</h4>
+                    <p><strong>Konu:</strong> Metinde Ana Fikir</p>
+                    <p><strong>Öğretmen:</strong> Türkçe Öğretmeni</p>
+                </div>
+                <div class="dersKarti">
+                    <h4>🌍 Sosyal Bilgiler</h4>
+                    <p><strong>Konu:</strong> Kültür ve Miras</p>
+                    <p><strong>Öğretmen:</strong> Sosyal Öğretmeni</p>
+                </div>
+                <div class="dersKarti">
+                    <h4>🇬🇧 İngilizce</h4>
+                    <p><strong>Konu:</strong> Unit 3: Life Processes</p>
+                    <p><strong>Öğretmen:</strong> İngilizce Öğretmeni</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="odevlerPaneli" class="sayfaPaneli">
+            <h2>📝 Ödevler ve Teslim Tarihleri</h2>
+            <ul style="margin-top: 15px;">
+                <li class="listeElemani"><strong>Matematik:</strong> Sayfa 42-45 arası Alıştırmalar <em>(Son Gün: Cuma)</em></li>
+                <li class="listeElemani"><strong>Fen Bilimleri:</strong> Gezegenler Maketi Projesi <em>(Son Gün: Pazartesi)</em></li>
+                <li class="listeElemani"><strong>Türkçe:</strong> 2 Sayfa Kitap Özeti Çıkarma <em>(Son Gün: Çarşamba)</em></li>
+            </ul>
+        </div>
+
+        <div id="duyurularPaneli" class="sayfaPaneli">
+            <h2>📢 Sınıf Duyuruları</h2>
+            <ul style="margin-top: 15px;">
+                <li class="listeElemani"><strong>Veli Toplantısı:</strong> Bu cuma saat 15:00'te yapılacaktır.</li>
+                <li class="listeElemani"><strong>Müze Gezisi:</strong> Önümüzdeki hafta salı günü müze gezimiz var. İzin belgelerinizi unutmayın!</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// SUPABASE BAGLANTISI
+const SUPABASE_URL = 'https://idgexsicpsdbhfgwjsbj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkZ2V4c2ljcHNkYmhmZ3dqc2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4Mzc3MTAsImV4cCI6MjEwMzQxMzcxMH0.EEPLAW2T_TM-X4nTG6n0vIydnsNVDx9sTpeska2DWdg';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let mevcutKullanici = "";
+let peer = null;
+let mevcutarama = null;
+
+// GİRİŞ YAPMA
+function girisYap() {
+    const input = document.getElementById("kullaniciAdiInput");
+    const isim = input.value.trim();
+    if (!isim) { alert("Lütfen geçerli bir ad girin!"); return; }
+
+    mevcutKullanici = isim;
+    document.getElementById("girisEkrani").style.display = "none";
+
+    initPeer();
+    eskiMesajlariYukle();
+}
+
+// SUPABASE'DEN ESKİ MESAJLARI ÇEKME
+async function eskiMesajlariYukle() {
+    const { data, error } = await supabaseClient
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (data) {
+        document.getElementById("mesajAlani").innerHTML = "";
+        data.forEach(msg => {
+            ekranaMesajEkle(msg.sender, msg.content, msg.is_sticker, msg.sender === mevcutKullanici, msg.id);
+        });
+    }
+}
+
+// SEKME DEĞİŞTİRME
+function sekmeDegistir(sekmeAdi, btn) {
+    document.querySelectorAll('.sayfaPaneli').forEach(el => el.classList.remove('aktif'));
+    document.querySelectorAll('.sekmeBtn').forEach(el => el.classList.remove('aktif'));
+
+    document.getElementById(sekmeAdi + 'Paneli').classList.add('aktif');
+    btn.classList.add('aktif');
+}
+
+// PEERJS (Görüntülü Konuşma)
+function initPeer() {
+    peer = new Peer();
+
+    peer.on('open', id => {
+        document.getElementById('myPeerId').innerText = "Arama Kodun: " + id;
+    });
+
+    peer.on('call', call => {
+        if (confirm("Gelen görüntülü arama var! Açmak istiyor musun?")) {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+                document.getElementById('videoModal').style.display = 'flex';
+                document.getElementById('localVideo').srcObject = stream;
+                call.answer(stream);
+                call.on('stream', remoteStream => {
+                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                });
+                mevcutarama = call;
+            }).catch(err => alert("Kamera ve mikrofon erişimi başarısız: " + err));
+        }
+    });
+}
+
+function goruntuluAra() {
+    const hedefId = document.getElementById("aramaIdInput").value.trim();
+    if (!hedefId) { alert("Lütfen aramak istediğin kişinin Arama Kodunu yaz!"); return; }
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+        document.getElementById('videoModal').style.display = 'flex';
+        document.getElementById('localVideo').srcObject = stream;
+
+        const call = peer.call(hedefId, stream);
+        call.on('stream', remoteStream => {
+            document.getElementById('remoteVideo').srcObject = remoteStream;
+        });
+        mevcutarama = call;
+    }).catch(err => alert("Kamera izni verilemedi: " + err));
+}
+
+function aramayiKapat() {
+    if (mevcutarama) mevcutarama.close();
+    document.getElementById('videoModal').style.display = 'none';
+}
+
+// STICKER VE MESAJ GÖNDERME
+function stickerYukle(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            mesajGonder(e.target.result, true);
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function mesajGonder(icerik = null, isSticker = false) {
+    const inp = document.getElementById("mesajInput");
+    const metin = icerik || inp.value.trim();
+    if (!metin) return;
+
+    // Supabase Veritabanına Kaydet
+    const payload = {
+        sender: mevcutKullanici,
+        content: metin,
+        is_sticker: isSticker
+    };
+
+    const { data, error } = await supabaseClient.from('messages').insert([payload]).select();
+
+    const newId = data ? data[0].id : null;
+    ekranaMesajEkle(mevcutKullanici, metin, isSticker, true, newId);
+
+    if (!icerik) inp.value = "";
+}
+
+function ekranaMesajEkle(gonderen, icerik, isSticker, kendiMesajim = false, msgId = null) {
+    const alan = document.getElementById("mesajAlani");
+    const div = document.createElement("div");
+    div.className = "mesaj" + (kendiMesajim ? " kendiMesajim" : "") + (isSticker ? " sticker" : "");
+    if (msgId) div.setAttribute("data-id", msgId);
+
+    let html = `<div class="gonderenAdi">${gonderen} <button class="mesajSilBtn" onclick="tekMesajSil(this)">🗑️</button></div>`;
+    if (isSticker) {
+        html += `<img src="${icerik}" alt="Sticker">`;
+    } else {
+        html += `<div>${icerik}</div>`;
+    }
+
+    div.innerHTML = html;
+    alan.appendChild(div);
+    alan.scrollTop = alan.scrollHeight;
+}
+
+async function tekMesajSil(btn) {
+    const msgDiv = btn.closest('.mesaj');
+    const msgId = msgDiv.getAttribute("data-id");
+
+    if (msgId) {
+        await supabaseClient.from('messages').delete().eq('id', msgId);
+    }
+    msgDiv.remove();
+}
+
+async function sohbetiTemizle() {
+    if (confirm("Tüm sohbeti veritabanından silmek istediğinden emin misin?")) {
+        await supabaseClient.from('messages').delete().neq('id', 0);
+        document.getElementById("mesajAlani").innerHTML = "";
+    }
+}
+</script>
+</body>
+</html>
