@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>6C Online</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #ececec;
+            color: #333;
+        }
+
+        /* ÜST KISIM */
+
+        header {
+            background: linear-gradient(90deg, #662d91, #8e44ad, #e84393);
+            color: white;
+            padding: 20px 8%;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ffe600;
+        }
+
+
+        /* MENÜ */
+
+        nav {
+            background: white;
+            border-bottom: 1px solid #ccc;
+            padding: 0 8%;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            padding: 18px 5px;
+            text-decoration: none;
+            color: #555;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #8e44ad;
+            border-bottom: 3px solid #8e44ad;
+        }
+
+
+        /* ANA SAYFA */
+
+        .kapsayici {
+            width: 85%;
+            max-width: 1100px;
+            margin: 30px auto;
+
+            display: grid;
+            grid-template-columns: 220px 1fr 250px;
+            gap: 20px;
+        }
+
+
+        /* KARTLAR */
+
+        .kart {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
+
+
+        /* SOL TARAF PROFİL */
+
+        .profil {
+            text-align: center;
+        }
+
+        .profil-resmi {
+            width: 100px;
+            height: 100px;
+
+            background: linear-gradient(135deg, #8e44ad, #e84393);
+
+            border-radius: 50%;
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 45px;
+        }
+
+        .profil h3 {
+            margin-bottom: 5px;
+        }
+
+        .profil p {
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        /* DUYURU */
+
+        .duyuru {
+            border-left: 6px solid #e84393;
+        }
+
+        .duyuru h2 {
+            margin-top: 0;
+            color: #8e44ad;
+        }
+
+
+        /* GÖNDERİ */
+
+        .gonderi-baslik {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .kucuk-profil {
+            width: 45px;
+            height: 45px;
+
+            background: #8e44ad;
+
+            border-radius: 50%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: white;
+        }
+
+        .gonderi {
+            margin-top: 20px;
+        }
+
+        .gonderi-icerik {
+            padding: 15px 0;
+            font-size: 17px;
+        }
+
+        .gonderi-islemler {
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+
+            display: flex;
+            gap: 20px;
+
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+
+        /* SAĞ TARAF */
+
+        .cevrimici-kisi {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cevrimici-nokta {
+            display: inline-block;
+
+            width: 10px;
+            height: 10px;
+
+            background: #2ecc71;
+            border-radius: 50%;
+
+            margin-right: 8px;
+        }
+
+
+        /* ALT KISIM */
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+
+        /* TELEFON GÖRÜNÜMÜ */
+
+        @media (max-width: 800px) {
+
+            .kapsayici {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                overflow-x: auto;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- ÜST BAŞLIK -->
+
+    <header>
+        <div class="logo">
+            6C <span>Online</span>
+        </div>
+    </header>
+
+
+    <!-- MENÜ -->
+
+    <nav>
+        <a href="#">🏠 Ana Sayfa</a>
+        <a href="#">📢 Duyurular</a>
+        <a href="#">👥 Öğrenciler</a>
+        <a href="#">📷 Fotoğraflar</a>
+    </nav>
+
+
+    <!-- ANA İÇERİK -->
+
+    <div class="kapsayici">
+
+
+        <!-- SOL TARAF -->
+
+        <aside>
+
+            <div class="kart profil">
+
+                <div class="profil-resmi">🎓</div>
+
+                <h3>6C Sınıfı</h3>
+
+                <p>Okul • Öğrenciler • Eğlence</p>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ORTA KISIM -->
+
+        <main>
+
+
+            <!-- DUYURU -->
+
+            <div class="kart duyuru">
+
+                <h2>📢 Duyurular</h2>
+
+                <h3>Okulların açılmasına az kaldı!</h3>
+
+                <p>
+                    Yeni okul yılı için hazır mısınız? 👀
+                </p>
+
+            </div>
+
+
+            <!-- GÖNDERİ -->
+
+            <div class="kart gonderi">
+
+                <div class="gonderi-baslik">
+
+                    <div class="kucuk-profil">
+                        6C
+                    </div>
+
+                    <div>
+                        <b>6C Online</b>
+                        <br>
+                        <small>Az önce</small>
+                    </div>
+
+                </div>
+
+
+                <div class="gonderi-icerik">
+
+                    Yeni okul yılı yaklaşıyor! 🎒✨
+
+                    <br><br>
+
+                    Bu sene burada duyurular, fotoğraflar ve
+                    sınıftan haberler paylaşılacak.
+
+                </div>
+
+
+                <div class="gonderi-islemler">
+
+                    <span>❤️ Beğen</span>
+
+                    <span>💬 Yorum</span>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- SAĞ TARAF -->
+
+        <aside>
+
+            <div class="kart">
+
+                <h3>🟢 Çevrimiçi</h3>
+
+
+                <div class="cevrimici-kisi">
+
+                    <span class="cevrimici-nokta"></span>
+
+                    Öğrenci 1
+
+                </div>
+
+
+                <div class="cevrimici-kisi">
+
+                    <span class="cevrimici-nokta"></span>
+
+                    Öğrenci 2
+
+                </div>
+
+
+                <div class="cevrimici-kisi">
+
+                    <span class="cevrimici-nokta"></span>
+
+                    Öğrenci 3
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+    </div>
+
+
+    <!-- ALT KISIM -->
+
+    <footer>
+
+        © 2026 6C Online • Sınıfımızın köşesi ✨
+
+    </footer>
+
+
+</body>
+
+</html>
